@@ -13,7 +13,7 @@
 (set-keyboard-coding-system 'utf-8)
 
 ; Custom packages stored in my emacs repository
-(add-to-list 'load-path (concat default-directory "/packages"))
+(add-to-list 'load-path (concat (file-name-directory buffer-file-name) "/packages"))
 
 (require 'package)
 (setq package-enable-at-startup nil)
