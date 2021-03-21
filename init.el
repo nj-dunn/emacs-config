@@ -15,6 +15,8 @@
 ; Custom packages stored in my emacs repository
 (add-to-list 'load-path (concat (file-name-directory buffer-file-name) "/packages"))
 
+(setq-default indent-tabs-mode nil)
+
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
@@ -32,6 +34,8 @@
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
 
+; Allows Using S-Up, S-Down, S-Left, S-right to switch between active windows
+(windmove-default-keybindings)
 (global-hl-line-mode +1)
 (line-number-mode +1)
 ; (global-display-line-numbers-mode 1) emacs-26 only
@@ -144,9 +148,16 @@
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
-(require 'multi-term)
-(setq multi-term-program "/bin/bash")
+(use-package popwin
+  :config
+  (popwin-mode 1))
 
+
+(require 'multi-term)
+(if (eq system-type 'darwin)
+    (setq multi-term-program "/bin/zsh")
+  (setq multi-term-program "/bin/bash")
+)
 (load "glsl")
 ; Some additional shader extensions I've seen
 (add-to-list 'auto-mode-alist '("\\.vs$" . glsl-mode))
