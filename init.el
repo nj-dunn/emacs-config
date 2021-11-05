@@ -71,6 +71,11 @@
 (use-package magit
   :bind (("C-M-g" . magit-status)))
 
+(use-package anzu
+  :ensure t
+  :config
+  (global-anzu-mode +1))
+
 (use-package helm
   :ensure t
   :defer 2
