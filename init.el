@@ -164,6 +164,11 @@
 (add-to-list 'auto-mode-alist '("\\.vs$" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.fs$" . glsl-mode))
 
+(global-set-key (kbd "C-x <up>") 'windmove-up)
+(global-set-key (kbd "C-x <down>") 'windmove-down)
+(global-set-key (kbd "C-x <left>") 'windmove-left)
+(global-set-key (kbd "C-x <right>") 'windmove-right)
+
 ; New frames will not have to load the configuration from scratch
 (require 'server)
 (if (not (server-running-p)) (server-start))
