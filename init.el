@@ -14,7 +14,7 @@
 (set-keyboard-coding-system 'utf-8)
 
 ; Custom packages stored in my emacs repository
-(add-to-list 'load-path (concat (file-name-directory buffer-file-name) "/packages"))
+(add-to-list 'load-path (concat user-emacs-directory "/packages"))
 
 (setq-default indent-tabs-mode nil)
 
