@@ -1,8 +1,9 @@
+
 ; Starting point was user configuration at:
 ; https://www.sandeepnambiar.com/my-minimal-emacs-setup/
 
 (setq user-full-name "Nathan Dunn"
-      user-mail-address "njdu@protonmail.com")
+      user-mail-address "nathan@nathandunn.dev")
 
 (setq gc-cons-threshold 50000000)
 (setq large-file-warning-threshold 100000000)
@@ -156,9 +157,26 @@
 
 (require 'multi-term)
 (if (eq system-type 'darwin)
-    (setq multi-term-program "/bin/zsh")
-  (setq multi-term-program "/bin/bash")
-)
+    (progn
+      (setq multi-term-program "/bin/zsh")
+      (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
+      )
+  (progn
+    (setq multi-term-program "/bin/bash")
+    (setq markdown-executable-path "/usr/local/bin/pandoc")
+  )
+ )
+
+(custom-set-variables
+ '(markdown-command markdown-executable-path)
+ )
+
+
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(add-hook 'markdown-mode-hook 'turn-on-auto-fill)
+(setq-default fill-column 80)
+
+
 (load "glsl")
 ; Some additional shader extensions I've seen
 (add-to-list 'auto-mode-alist '("\\.vs$" . glsl-mode))
@@ -172,3 +190,5 @@
 ; New frames will not have to load the configuration from scratch
 (require 'server)
 (if (not (server-running-p)) (server-start))
+
+
