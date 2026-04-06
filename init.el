@@ -85,7 +85,8 @@
     (show-paren-mode t)))
 
 (use-package magit
-  :straight t)
+  :straight t
+   :bind (("C-x g" . magit-status)))
 
 (use-package anzu
   :straight t
