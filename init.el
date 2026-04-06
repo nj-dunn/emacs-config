@@ -7,29 +7,34 @@
 
 (setq gc-cons-threshold 50000000)
 (setq large-file-warning-threshold 100000000)
-
+(set-language-environment "UTF-8")
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
+
+(setq package-enable-at-startup nil)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
 ; Custom packages stored in my emacs repository
 (add-to-list 'load-path (concat user-emacs-directory "/packages"))
 
-(setq-default indent-tabs-mode nil)
-
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-(package-initialize)
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-when-compile
-  (require 'use-package))
+(setq-default indent-tabs-mode t)
 
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
@@ -45,11 +50,13 @@
 
 (setq inhibit-startup-screen t)
 
-(use-package doom-themes
-  :ensure t
+(use-package ef-themes
+  :straight t
   :config
-  (load-theme 'doom-one t)
-  (doom-themes-visual-bell-config))
+  (load-theme 'ef-autumn t))
+
+(set-frame-parameter nil 'alpha-background 85)
+(add-to-list 'default-frame-alist '(alpha-background . 70))
 
 ;; Backup files with ~ are annoying - let's put them in a temp directory
 (setq backup-directory-alist
@@ -60,8 +67,16 @@
 ; If file changes externally, automatically reload it
 (global-auto-revert-mode t)
 
+(require 'eglot)
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
+(add-hook 'c-or-c++-mode-hook 'eglot-ensure)
+
+(add-to-list 'eglot-server-programs
+             '((c++-mode c-mode) . ("clangd" "-log=verbose" "-pretty" "-offset-encoding=utf-16")))
+
 (use-package smartparens
-  :ensure t
+  :straight t
   :diminish smartparens-mode
   :config
   (progn
@@ -70,15 +85,15 @@
     (show-paren-mode t)))
 
 (use-package magit
-  :bind (("C-M-g" . magit-status)))
+  :straight t)
 
 (use-package anzu
-  :ensure t
+  :straight t
   :config
   (global-anzu-mode +1))
 
 (use-package helm
-  :ensure t
+  :straight t
   :defer 2
   :bind
   ("M-x" . helm-M-x)
@@ -86,7 +101,6 @@
   ("M-y" . helm-show-kill-ring)
   ("C-x b" . helm-mini)
   :config
-  (require 'helm-config)
   (helm-mode 1)
   (setq helm-split-window-inside-p t
     helm-move-to-line-cycle-in-source t)
@@ -103,9 +117,25 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("cee5c56dc8b95b345bfe1c88d82d48f89e0f23008b0c2154ef452b2ce348da37"
+     "ac893acecb0f1cf2b6ccea5c70ea97516c13c2b80c07f3292c21d6eb0cb45239"
+     "59c36051a521e3ea68dc530ded1c7be169cd19e8873b7994bfc02a216041bf3b"
+     "296dcaeb2582e7f759e813407ff1facfd979faa071cf27ef54100202c45ae7d4"
+     "a3a71b922fb6cbf9283884ac8a9109935e04550bcc5d2a05414a58c52a8ffc47"
+     "ae20535e46a88faea5d65775ca5510c7385cbf334dfa7dde93c0cd22ed663ba0"
+     "00d7122017db83578ef6fba39c131efdcb59910f0fac0defbe726da8072a0729"
+     "36c5acdaf85dda0dad1dd3ad643aacd478fb967960ee1f83981d160c52b3c8ac"
+     "ea4dd126d72d30805c083421a50544e235176d9698c8c541b824b60912275ba1"
+     "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098"
+     "3cdd0a96236a9db4e903c01cb45c0c111eb1492313a65790adb894f9f1a33b2d"
+     "9013233028d9798f901e5e8efb31841c24c12444d3b6e92580080505d56fd392"
+     "a9eeab09d61fef94084a95f82557e147d9630fbbb82a837f971f83e66e21e5ad"
+     "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" default))
+ '(markdown-command markdown-executable-path)
  '(package-selected-packages
-   (quote
-    (use-package smartparens helm doom-themes))))
+   '(company doom-themes ef-themes eglot flycheck gnu-elpa-keyring-update helm
+	     magit smartparens treemacs use-package which-key yaml-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -113,64 +143,51 @@
  ;; If there is more than one, they won't work right.
  )
 
-(use-package helm-gtags
-  :if (locate-file "gtags" exec-path)
-  :config
-  (setq
-    helm-gtags-ignore-case t
-    helm-gtags-auto-update t
-    helm-gtags-use-input-at-cursor t
-    helm-gtags-pulse-at-cursor t
-    helm-gtags-suggested-key-mapping t)
-   (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
-   (define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
-   (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
-   (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
-   (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
-   (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
-  )
-
 ; With a delay in key strokes, suggests a key stroke command
 (use-package which-key
-  :ensure t
+  :straight t
   :diminish which-key-mode
   :config
   (which-key-mode +1))
 
 (use-package company
-  :ensure t
+  :straight t
   :diminish company-mode
   :config
   (add-hook 'after-init-hook #'global-company-mode))
 
 ; Syntax checking
 (use-package flycheck
-  :ensure t
+  :straight t
   :diminish flycheck-mode
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
-(use-package popwin
+(defvar my-terminal-shell
+  (if (eq system-type 'darwin) "/bin/zsh" "/bin/bash"))
+
+(use-package vterm
+  :straight t
+  :commands (vterm my/open-terminal)
   :config
-  (popwin-mode 1))
+  (setq vterm-shell my-terminal-shell)
+  (defun my/open-terminal (&optional _arg)
+    (interactive "P")
+    (vterm))
+  (defalias 'ansi-term #'my/open-terminal)
+  (defalias 'term #'my/open-terminal)
+  (defalias 'multi-term #'my/open-terminal))
 
-
-(require 'multi-term)
 (if (eq system-type 'darwin)
-    (progn
-      (setq multi-term-program "/bin/zsh")
-      (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
-      )
-  (progn
-    (setq multi-term-program "/bin/bash")
-    (setq markdown-executable-path "/usr/local/bin/pandoc")
-  )
- )
+    (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
+  (setq markdown-executable-path "/usr/local/bin/pandoc"))
 
-(custom-set-variables
- '(markdown-command markdown-executable-path)
- )
 
+(use-package mcp-server
+  :straight (:type git :host github :repo "rhblind/emacs-mcp-server"
+             :files ("*.el" "tools/*.el" "mcp-wrapper.py" "mcp-wrapper.sh"))
+  :config
+  (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
@@ -190,5 +207,3 @@
 ; New frames will not have to load the configuration from scratch
 (require 'server)
 (if (not (server-running-p)) (server-start))
-
-
