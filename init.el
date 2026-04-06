@@ -179,6 +179,11 @@
   (defalias 'term #'my/open-terminal)
   (defalias 'multi-term #'my/open-terminal))
 
+(use-package multi-vterm
+  :straight (:type git :host github :repo "suonlight/multi-vterm"
+	     :files("*.el"))
+  )
+
 (if (eq system-type 'darwin)
     (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
   (setq markdown-executable-path "/usr/local/bin/pandoc"))
