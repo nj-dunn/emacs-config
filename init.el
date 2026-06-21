@@ -50,11 +50,6 @@
 
 (setq inhibit-startup-screen t)
 
-(use-package ef-themes
-  :straight t
-  :config
-  (load-theme 'ef-autumn t))
-
 (set-frame-parameter nil 'alpha-background 85)
 (add-to-list 'default-frame-alist '(alpha-background . 70))
 
@@ -74,6 +69,9 @@
 
 (add-to-list 'eglot-server-programs
              '((c++-mode c-mode) . ("clangd" "-log=verbose" "-pretty" "-offset-encoding=utf-16")))
+
+(straight-use-package 'gptel)
+(setq gptel-default-mode 'markdown-mode)
 
 (use-package smartparens
   :straight t
@@ -119,7 +117,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("cee5c56dc8b95b345bfe1c88d82d48f89e0f23008b0c2154ef452b2ce348da37"
+   '("b1e991696e0f8c0b0e17ca9048ba567cde123c865e2721283de6e98defc3d102"
+     "cee5c56dc8b95b345bfe1c88d82d48f89e0f23008b0c2154ef452b2ce348da37"
      "ac893acecb0f1cf2b6ccea5c70ea97516c13c2b80c07f3292c21d6eb0cb45239"
      "59c36051a521e3ea68dc530ded1c7be169cd19e8873b7994bfc02a216041bf3b"
      "296dcaeb2582e7f759e813407ff1facfd979faa071cf27ef54100202c45ae7d4"
@@ -144,6 +143,9 @@
  ;; If there is more than one, they won't work right.
  )
 
+(straight-use-package
+ '(emacs-materialized-theme :type git :host github :repo "xenodium/emacs-materialized-theme" :branch "main"))
+
 ; With a delay in key strokes, suggests a key stroke command
 (use-package which-key
   :straight t
@@ -163,6 +165,12 @@
   :diminish flycheck-mode
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
+
+(use-package robot-mode
+  :straight t
+  )
+(add-to-list 'auto-mode-alist '("\\.robot$" . robot-mode))
+(add-to-list 'auto-mode-alist '("\\.resource$" . robot-mode))
 
 (defvar my-terminal-shell
   (if (eq system-type 'darwin) "/bin/zsh" "/bin/bash"))
@@ -184,16 +192,43 @@
 	     :files("*.el"))
   )
 
+; In order for delete key to work when using emacs in terminal mode
+; not needed for gui - see https://github.com/akermu/emacs-libvterm/issues/741
+(define-key vterm-mode-map [deletechar] #'vterm-send-delete)
+
+(straight-use-package 'markdown-mode)
+
 (if (eq system-type 'darwin)
     (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
   (setq markdown-executable-path "/usr/local/bin/pandoc"))
 
 
 (use-package mcp-server
-  :straight (:type git :host github :repo "rhblind/emacs-mcp-server"
+  :straight (mcp-server
+             :type git
+             :host github
+             :repo "rhblind/emacs-mcp-server"
              :files ("*.el" "tools/*.el" "mcp-wrapper.py" "mcp-wrapper.sh"))
   :config
   (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
+
+(use-package moody
+  :straight t
+  :config
+  (setq-default mode-line-format
+		'(""
+		  mode-line-front-space
+		  mode-line-client
+		  mode-line-frame-identification
+		  mode-line-buffer-identification
+		  " "
+		  mode-line-position
+		  (vc-mode vc-mode)
+		  (multiple-cursors-mode mc/mode-line)
+		  mode-line-modes
+		  mode-line-end-spaces))
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
@@ -213,3 +248,18 @@
 ; New frames will not have to load the configuration from scratch
 (require 'server)
 (if (not (server-running-p)) (server-start))
+
+(use-package agent-shell
+  :straight t
+  :config
+  (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
+  ; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
+  ; Terminal emulator may have its own TAB bindings
+  (with-eval-after-load 'agent-shell-viewport
+    (keymap-set agent-shell-viewport-edit-mode-map "C-c TAB" #'agent-shell-viewport-cycle-session-mode)
+    (keymap-set agent-shell-viewport-view-mode-map "C-c TAB" #'agent-shell-viewport-cycle-session-mode)))
+
+(setq agent-shell-openai-authentication
+      (agent-shell-openai-make-authentication :login t))
+
+
