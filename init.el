@@ -1,6 +1,6 @@
 
-; Starting point was user configuration at:
-; https://www.sandeepnambiar.com/my-minimal-emacs-setup/
+					; Starting point was user configuration at:
+					; https://www.sandeepnambiar.com/my-minimal-emacs-setup/
 
 (setq user-full-name "Nathan Dunn"
       user-mail-address "nathan@nathandunn.dev")
@@ -31,7 +31,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-; Custom packages stored in my emacs repository
+					; Custom packages stored in my emacs repository
 (add-to-list 'load-path (concat user-emacs-directory "/packages"))
 
 (setq-default indent-tabs-mode t)
@@ -40,11 +40,11 @@
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
 
-; Allows Using S-Up, S-Down, S-Left, S-right to switch between active windows
+					; Allows Using S-Up, S-Down, S-Left, S-right to switch between active windows
 (windmove-default-keybindings)
 (global-hl-line-mode +1)
 (line-number-mode +1)
-; (global-display-line-numbers-mode 1) emacs-26 only
+					; (global-display-line-numbers-mode 1) emacs-26 only
 (column-number-mode t)
 (size-indication-mode t)
 
@@ -59,7 +59,7 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-; If file changes externally, automatically reload it
+					; If file changes externally, automatically reload it
 (global-auto-revert-mode t)
 
 (require 'eglot)
@@ -74,42 +74,42 @@
 (setq gptel-default-mode 'markdown-mode)
 
 (use-package smartparens
-  :straight t
-  :diminish smartparens-mode
-  :config
-  (progn
-    (require 'smartparens-config)
-    (smartparens-global-mode 1)
-    (show-paren-mode t)))
+    :straight t
+    :diminish smartparens-mode
+    :config
+    (progn
+      (require 'smartparens-config)
+      (smartparens-global-mode 1)
+      (show-paren-mode t)))
 
 (use-package magit
-  :straight t
-   :bind (("C-x g" . magit-status)))
+    :straight t
+    :bind (("C-x g" . magit-status)))
 
 (use-package anzu
-  :straight t
-  :config
-  (global-anzu-mode +1))
+    :straight t
+    :config
+    (global-anzu-mode +1))
 
 (use-package helm
-  :straight t
-  :defer 2
-  :bind
-  ("M-x" . helm-M-x)
-  ("C-x C-f" . helm-find-files)
-  ("M-y" . helm-show-kill-ring)
-  ("C-x b" . helm-mini)
-  :config
-  (helm-mode 1)
-  (setq helm-split-window-inside-p t
-    helm-move-to-line-cycle-in-source t)
-  (setq helm-autoresize-max-height 0)
-  (setq helm-autoresize-min-height 20)
-  (helm-autoresize-mode 1)
-  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-  )
+    :straight t
+    :defer 2
+    :bind
+    ("M-x" . helm-M-x)
+    ("C-x C-f" . helm-find-files)
+    ("M-y" . helm-show-kill-ring)
+    ("C-x b" . helm-mini)
+    :config
+    (helm-mode 1)
+    (setq helm-split-window-inside-p t
+	  helm-move-to-line-cycle-in-source t)
+    (setq helm-autoresize-max-height 0)
+    (setq helm-autoresize-min-height 20)
+    (helm-autoresize-mode 1)
+    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+    (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+    )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -135,7 +135,7 @@
  '(markdown-command markdown-executable-path)
  '(package-selected-packages
    '(company doom-themes ef-themes eglot flycheck gnu-elpa-keyring-update helm
-	     magit smartparens treemacs use-package which-key yaml-mode)))
+     magit smartparens treemacs use-package which-key yaml-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -145,30 +145,31 @@
 
 (straight-use-package
  '(emacs-materialized-theme :type git :host github :repo "xenodium/emacs-materialized-theme" :branch "main"))
+(load-theme 'materialized)
 
-; With a delay in key strokes, suggests a key stroke command
+					; With a delay in key strokes, suggests a key stroke command
 (use-package which-key
-  :straight t
-  :diminish which-key-mode
-  :config
-  (which-key-mode +1))
+    :straight t
+    :diminish which-key-mode
+    :config
+    (which-key-mode +1))
 
 (use-package company
-  :straight t
-  :diminish company-mode
-  :config
-  (add-hook 'after-init-hook #'global-company-mode))
+    :straight t
+    :diminish company-mode
+    :config
+    (add-hook 'after-init-hook #'global-company-mode))
 
-; Syntax checking
+					; Syntax checking
 (use-package flycheck
-  :straight t
-  :diminish flycheck-mode
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+    :straight t
+    :diminish flycheck-mode
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package robot-mode
-  :straight t
-  )
+    :straight t
+    )
 (add-to-list 'auto-mode-alist '("\\.robot$" . robot-mode))
 (add-to-list 'auto-mode-alist '("\\.resource$" . robot-mode))
 
@@ -176,59 +177,59 @@
   (if (eq system-type 'darwin) "/bin/zsh" "/bin/bash"))
 
 (use-package vterm
-  :straight t
-  :commands (vterm my/open-terminal)
-  :config
-  (setq vterm-shell my-terminal-shell)
-  (defun my/open-terminal (&optional _arg)
-    (interactive "P")
-    (vterm))
-  (defalias 'ansi-term #'my/open-terminal)
-  (defalias 'term #'my/open-terminal)
-  (defalias 'multi-term #'my/open-terminal))
+    :straight t
+    :commands (vterm my/open-terminal)
+    :config
+    (setq vterm-shell my-terminal-shell)
+    (defun my/open-terminal (&optional _arg)
+      (interactive "P")
+      (vterm))
+    (defalias 'ansi-term #'my/open-terminal)
+    (defalias 'term #'my/open-terminal)
+    (defalias 'multi-term #'my/open-terminal))
 
 (use-package multi-vterm
-  :straight (:type git :host github :repo "suonlight/multi-vterm"
-	     :files("*.el"))
-  )
+    :straight (:type git :host github :repo "suonlight/multi-vterm"
+		     :files("*.el"))
+    )
 
-; In order for delete key to work when using emacs in terminal mode
-; not needed for gui - see https://github.com/akermu/emacs-libvterm/issues/741
+					; In order for delete key to work when using emacs in terminal mode
+					; not needed for gui - see https://github.com/akermu/emacs-libvterm/issues/741
 (define-key vterm-mode-map [deletechar] #'vterm-send-delete)
 
 (straight-use-package 'markdown-mode)
 
 (if (eq system-type 'darwin)
     (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
-  (setq markdown-executable-path "/usr/local/bin/pandoc"))
+    (setq markdown-executable-path "/usr/local/bin/pandoc"))
 
 
 (use-package mcp-server
-  :straight (mcp-server
-             :type git
-             :host github
-             :repo "rhblind/emacs-mcp-server"
-             :files ("*.el" "tools/*.el" "mcp-wrapper.py" "mcp-wrapper.sh"))
-  :config
-  (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
+    :straight (mcp-server
+               :type git
+               :host github
+               :repo "rhblind/emacs-mcp-server"
+               :files ("*.el" "tools/*.el" "mcp-wrapper.py" "mcp-wrapper.sh"))
+    :config
+    (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
 
 (use-package moody
-  :straight t
-  :config
-  (setq-default mode-line-format
-		'(""
-		  mode-line-front-space
-		  mode-line-client
-		  mode-line-frame-identification
-		  mode-line-buffer-identification
-		  " "
-		  mode-line-position
-		  (vc-mode vc-mode)
-		  (multiple-cursors-mode mc/mode-line)
-		  mode-line-modes
-		  mode-line-end-spaces))
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
+    :straight t
+    :config
+    (setq-default mode-line-format
+		  '(""
+		    mode-line-front-space
+		    mode-line-client
+		    mode-line-frame-identification
+		    mode-line-buffer-identification
+		    " "
+		    mode-line-position
+		    (vc-mode vc-mode)
+		    (multiple-cursors-mode mc/mode-line)
+		    mode-line-modes
+		    mode-line-end-spaces))
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
@@ -236,7 +237,7 @@
 
 
 (load "glsl")
-; Some additional shader extensions I've seen
+					; Some additional shader extensions I've seen
 (add-to-list 'auto-mode-alist '("\\.vs$" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.fs$" . glsl-mode))
 
@@ -245,21 +246,35 @@
 (global-set-key (kbd "C-x <left>") 'windmove-left)
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 
-; New frames will not have to load the configuration from scratch
+					; New frames will not have to load the configuration from scratch
 (require 'server)
 (if (not (server-running-p)) (server-start))
 
 (use-package agent-shell
-  :straight t
-  :config
-  (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
-  ; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
-  ; Terminal emulator may have its own TAB bindings
-  (with-eval-after-load 'agent-shell-viewport
-    (keymap-set agent-shell-viewport-edit-mode-map "C-c TAB" #'agent-shell-viewport-cycle-session-mode)
-    (keymap-set agent-shell-viewport-view-mode-map "C-c TAB" #'agent-shell-viewport-cycle-session-mode)))
+    :straight t
+    :config
+    (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
+					; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
+					; Terminal emulator may have its own TAB bindings
+    (with-eval-after-load 'agent-shell-viewport
+      (keymap-set agent-shell-viewport-edit-mode-map "C-c TAB" #'agent-shell-viewport-cycle-session-mode)
+      (keymap-set agent-shell-viewport-view-mode-map "C-c TAB" #'agent-shell-viewport-cycle-session-mode)))
 
 (setq agent-shell-openai-authentication
       (agent-shell-openai-make-authentication :login t))
 
+(if (executable-find "rg")
+    (use-package rg  :straight t))
 
+
+(straight-use-package 'apheleia
+		      :config
+		      (apheleia-global-mode +1)
+		      (setf  (alist-get 'clang-format apheleia-formatters)
+			     '("clang-format" 
+			       "-assume-filename" (or (apheleia-formatters-local-buffer-file-name) 
+						   (apheleia-formatters-mode-extension) 
+						   ".c")
+			       "-style=file"               ; Forces looking for a local .clang-format file
+			       "-fallback-style=WebKit"))  ; Fallback if no config file is found
+		      )
