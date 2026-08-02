@@ -70,47 +70,62 @@
    .
    ("clangd" "-log=verbose" "-pretty" "-offset-encoding=utf-16")))
 
-(straight-use-package 'gptel)
-(setq gptel-default-mode 'markdown-mode)
+(use-package gptel
+  :straight t
+  :config
+  (setq gptel-model 'gpt-5.4-mini
+        gptel-default-mode 'markdown-mode
+	gptel-backend (gptel-make-openai-oauth "OpenAI-sub"))
+  )
+
 
 (use-package smartparens
-    :straight t
-    :diminish smartparens-mode
-    :config
-    (progn
-      (require 'smartparens-config)
-      (smartparens-global-mode 1)
-      (show-paren-mode t)))
+  :straight t
+  :diminish smartparens-mode
+  :config
+  (progn
+    (require 'smartparens-config)
+    (smartparens-global-mode 1)
+    (show-paren-mode t)))
 
 (use-package magit
-    :straight t
-    :bind (("C-x g" . magit-status)))
+  :straight t
+  :bind (("C-x g" . magit-status)))
 
 (use-package anzu
-    :straight t
-    :config
-    (global-anzu-mode +1))
+  :straight t
+  :config
+  (global-anzu-mode +1))
 
-(use-package helm
-    :straight t
-    :defer 2
-    :bind
-    ("M-x" . helm-M-x)
-    ("C-x C-f" . helm-find-files)
-    ("M-y" . helm-show-kill-ring)
-    ("C-x b" . helm-mini)
-    :config
-    (helm-mode 1)
-    (setq helm-split-window-inside-p t
-	  helm-move-to-line-cycle-in-source t)
-    (setq helm-autoresize-max-height 0)
-    (setq helm-autoresize-min-height 20)
-    (helm-autoresize-mode 1)
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-    (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-    )
 
+(use-package ivy
+  :straight t
+  :config
+  (ivy-mode)
+  (setopt ivy-use-virtual-buffers t)
+  (setopt enable-recursive-minibuffers t)
+  ;; Enable this if you want `swiper' to use it:
+  ;; (setopt search-default-mode #'char-fold-to-regexp)
+  (keymap-global-set "C-s" #'swiper-isearch)
+  (keymap-global-set "C-c C-r" #'ivy-resume)
+  (keymap-global-set "C-x b" #'ivy-switch-buffer)
+  (keymap-global-set "<f6>" #'ivy-resume)
+  (keymap-global-set "M-x" #'counsel-M-x)
+  (keymap-global-set "C-x C-f" #'counsel-find-file)
+  (keymap-global-set "C-x C-/" #'counsel-fzf)
+  (keymap-global-set "<f1> f" #'counsel-describe-function)
+  (keymap-global-set "<f1> v" #'counsel-describe-variable)
+  (keymap-global-set "<f1> o" #'counsel-describe-symbol)
+  (keymap-global-set "<f1> l" #'counsel-find-library)
+  (keymap-global-set "<f2> i" #'counsel-info-lookup-symbol)
+  (keymap-global-set "<f2> u" #'counsel-unicode-char)
+  (keymap-global-set "C-c g" #'counsel-git)
+  (keymap-global-set "C-c j" #'counsel-git-grep)
+  (keymap-global-set "C-c k" #'counsel-ag)
+  (keymap-global-set "C-x l" #'counsel-locate)
+  (keymap-global-set "C-S-o" #'counsel-rhythmbox)
+  (keymap-set minibuffer-local-map "C-r" #'counsel-minibuffer-history)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming and Aesthetics ;;
@@ -140,7 +155,7 @@
  '(markdown-command markdown-executable-path)
  '(package-selected-packages
    '(company doom-themes ef-themes eglot flycheck gnu-elpa-keyring-update helm
-     magit smartparens treemacs use-package which-key yaml-mode)))
+	     magit smartparens treemacs use-package which-key yaml-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -179,24 +194,24 @@
 
 ;; With a delay in key strokes, suggests a key stroke command
 (use-package
-    which-key
-    :straight t
-    :diminish which-key-mode
-    :config
-    (which-key-mode +1))
+  which-key
+  :straight t
+  :diminish which-key-mode
+  :config
+  (which-key-mode +1))
 
 (use-package
-    company
-    :straight t
-    :diminish company-mode
-    :config (add-hook 'after-init-hook #'global-company-mode))
+  company
+  :straight t
+  :diminish company-mode
+  :config (add-hook 'after-init-hook #'global-company-mode))
 
 ;; Syntax checking
 (use-package
-    flycheck
-    :straight t
-    :diminish flycheck-mode
-    :config (add-hook 'after-init-hook #'global-flycheck-mode))
+  flycheck
+  :straight t
+  :diminish flycheck-mode
+  :config (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package robot-mode :straight t)
 (add-to-list 'auto-mode-alist '("\\.robot$" . robot-mode))
@@ -205,24 +220,24 @@
 (defvar my-terminal-shell
   (if (eq system-type 'darwin)
       "/bin/zsh"
-      "/bin/bash"))
+    "/bin/bash"))
 
 (use-package
-    vterm
-    :straight t
-    :commands (vterm my/open-terminal)
-    :config
-    (setq vterm-shell my-terminal-shell)
-    (defun my/open-terminal (&optional _arg)
-      (interactive "P")
-      (vterm))
-    (defalias 'ansi-term #'my/open-terminal)
-    (defalias 'term #'my/open-terminal)
-    (defalias 'multi-term #'my/open-terminal))
+  vterm
+  :straight t
+  :commands (vterm my/open-terminal)
+  :config
+  (setq vterm-shell my-terminal-shell)
+  (defun my/open-terminal (&optional _arg)
+    (interactive "P")
+    (vterm))
+  (defalias 'ansi-term #'my/open-terminal)
+  (defalias 'term #'my/open-terminal)
+  (defalias 'multi-term #'my/open-terminal))
 
 (use-package
-    multi-vterm
-    :straight
+  multi-vterm
+  :straight
   (:type git :host github :repo "suonlight/multi-vterm" :files ("*.el")))
 
 ;; In order for delete key to work when using emacs in terminal mode
@@ -233,12 +248,12 @@
 
 (if (eq system-type 'darwin)
     (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
-    (setq markdown-executable-path "/usr/local/bin/pandoc"))
+  (setq markdown-executable-path "/usr/local/bin/pandoc"))
 
 
 (use-package
-    mcp-server
-    :straight
+  mcp-server
+  :straight
   (mcp-server
    :type git
    :host github
@@ -248,22 +263,22 @@
   :config (add-hook 'emacs-startup-hook #'mcp-server-start-unix))
 
 (use-package
-    moody
-    :straight t
-    :config
-    (setq-default mode-line-format
-		  '(""
-                    mode-line-front-space
-                    mode-line-client
-                    mode-line-frame-identification
-                    mode-line-buffer-identification
-                    " "
-                    mode-line-position
-                    (vc-mode vc-mode)
-                    (multiple-cursors-mode mc/mode-line)
-                    mode-line-modes
-                    mode-line-end-spaces))
-    (moody-replace-mode-line-buffer-identification) (moody-replace-vc-mode))
+  moody
+  :straight t
+  :config
+  (setq-default mode-line-format
+		'(""
+                  mode-line-front-space
+                  mode-line-client
+                  mode-line-frame-identification
+                  mode-line-buffer-identification
+                  " "
+                  mode-line-position
+                  (vc-mode vc-mode)
+                  (multiple-cursors-mode mc/mode-line)
+                  mode-line-modes
+                  mode-line-end-spaces))
+  (moody-replace-mode-line-buffer-identification) (moody-replace-vc-mode))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
@@ -281,20 +296,20 @@
     (server-start))
 
 (use-package
-    agent-shell
-    :straight t
-    :config (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
-    ;; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
-    ;; Terminal emulator may have its own TAB bindings
-    (with-eval-after-load 'agent-shell-viewport
-      (keymap-set
-       agent-shell-viewport-edit-mode-map
-       "C-c TAB"
-       #'agent-shell-viewport-cycle-session-mode)
-      (keymap-set
-       agent-shell-viewport-view-mode-map
-       "C-c TAB"
-       #'agent-shell-viewport-cycle-session-mode)))
+  agent-shell
+  :straight t
+  :config (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
+  ;; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
+  ;; Terminal emulator may have its own TAB bindings
+  (with-eval-after-load 'agent-shell-viewport
+    (keymap-set
+     agent-shell-viewport-edit-mode-map
+     "C-c TAB"
+     #'agent-shell-viewport-cycle-session-mode)
+    (keymap-set
+     agent-shell-viewport-view-mode-map
+     "C-c TAB"
+     #'agent-shell-viewport-cycle-session-mode)))
 
 (setq agent-shell-openai-authentication
       (agent-shell-openai-make-authentication :login t))
@@ -303,21 +318,50 @@
     (use-package rg :straight t))
 
 (use-package
-    exec-path-from-shell
-    :straight t
-    :config
-    (when (daemonp)
-      (exec-path-from-shell-initialize)))
+  exec-path-from-shell
+  :straight t
+  :config
+  (when (daemonp)
+    (exec-path-from-shell-initialize)))
 
+(use-package easysession
+  ;; ':demand t' ensures the package is loaded immediately upon startup
+  :straight t
+  :demand t
+
+  :config
+  ;; Save every 10 minutes
+  (setq easysession-save-interval (* 10 60))
+
+  ;; Save the current session when using `easysession-switch-to'
+  (setq easysession-switch-to-save-session t)
+
+  ;; Do not exclude the current session when switching sessions
+  (setq easysession-switch-to-exclude-current nil)
+
+  ;; Display the active session name in the mode-line lighter.
+  ;; (setq easysession-save-mode-lighter-show-session-name t)
+
+  ;; Optionally, the session name can be shown in the modeline info area:
+  ;; (setq easysession-mode-line-misc-info t)
+  ;; non-nil: Make `easysession-setup' load the session automatically.
+  ;; (nil: session is not loaded automatically; the user can load it manually.)
+  (setq easysession-setup-load-session t)
+
+  ;; The `easysession-setup' function adds hooks:
+  ;; - To enable automatic session loading during `emacs-startup-hook', or
+  ;;   `server-after-make-frame-hook' when running in daemon mode.
+  ;; - To save the session at regular intervals, and when Emacs exits.
+  (easysession-setup))
 
 (use-package
-    apheleia
-    :straight t
-    :config (apheleia-global-mode +1)
-    (setf (alist-get 'clang-format apheleia-formatters)
-	  '("clang-format" "-assume-filename"
-            (or (apheleia-formatters-local-buffer-file-name)
-             (apheleia-formatters-mode-extension)
-             ".c")
-            "-style=file" ; Forces looking for a local .clang-format file
-            "-fallback-style=WebKit"))) ; Fallback if no config file is found
+  apheleia
+  :straight t
+  :config (apheleia-global-mode +1)
+  (setf (alist-get 'clang-format apheleia-formatters)
+	'("clang-format" "-assume-filename"
+          (or (apheleia-formatters-local-buffer-file-name)
+	      (apheleia-formatters-mode-extension)
+	      ".c")
+          "-style=file" ; Forces looking for a local .clang-format file
+          "-fallback-style=WebKit"))) ; Fallback if no config file is found
