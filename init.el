@@ -1,7 +1,6 @@
 
 (setq
- user-full-name "Nathan Dunn"
- user-mail-address "mail@nathanjdunn.com")
+ user-full-name "Nathan Dunn")
 
 (setq gc-cons-threshold 50000000)
 (setq large-file-warning-threshold 100000000)
@@ -28,9 +27,6 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Custom packages stored in my emacs repository
-(add-to-list 'load-path (concat user-emacs-directory "/packages"))
-
 (setq-default indent-tabs-mode t)
 
 (menu-bar-mode -1)
@@ -56,6 +52,11 @@
 ;; If file changes externally, automatically reload it
 (global-auto-revert-mode t)
 
+;; Load Straight's newer compat before built-in packages such as Eglot
+;; Otherwise they can provide Emacs' bundled compat first, leaving Magit
+;; without newer shims such as `set-local` on Emacs 30
+(straight-use-package 'compat)
+
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; LSP Configuration ;;
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,11 +74,10 @@
 (use-package gptel
   :straight t
   :config
-  (setq gptel-model 'gpt-5.4-mini
+  (setq gptel-model 'gpt-5.6-sol
         gptel-default-mode 'markdown-mode
 	gptel-backend (gptel-make-openai-oauth "OpenAI-sub"))
   )
-
 
 (use-package smartparens
   :straight t
@@ -97,35 +97,36 @@
   :config
   (global-anzu-mode +1))
 
-
 (use-package ivy
   :straight t
+  :bind (("C-c C-r" . ivy-resume)
+	 ("C-x b" . ivy-switch-buffer)
+	 ("<f6>" . ivy-resume))
   :config
   (ivy-mode)
   (setopt ivy-use-virtual-buffers t)
   (setopt enable-recursive-minibuffers t)
   ;; Enable this if you want `swiper' to use it:
   ;; (setopt search-default-mode #'char-fold-to-regexp)
-  (keymap-global-set "C-s" #'swiper-isearch)
-  (keymap-global-set "C-c C-r" #'ivy-resume)
-  (keymap-global-set "C-x b" #'ivy-switch-buffer)
-  (keymap-global-set "<f6>" #'ivy-resume)
-  (keymap-global-set "M-x" #'counsel-M-x)
-  (keymap-global-set "C-x C-f" #'counsel-find-file)
-  (keymap-global-set "C-x C-/" #'counsel-fzf)
-  (keymap-global-set "<f1> f" #'counsel-describe-function)
-  (keymap-global-set "<f1> v" #'counsel-describe-variable)
-  (keymap-global-set "<f1> o" #'counsel-describe-symbol)
-  (keymap-global-set "<f1> l" #'counsel-find-library)
-  (keymap-global-set "<f2> i" #'counsel-info-lookup-symbol)
-  (keymap-global-set "<f2> u" #'counsel-unicode-char)
-  (keymap-global-set "C-c g" #'counsel-git)
-  (keymap-global-set "C-c j" #'counsel-git-grep)
-  (keymap-global-set "C-c k" #'counsel-ag)
-  (keymap-global-set "C-x l" #'counsel-locate)
-  (keymap-global-set "C-S-o" #'counsel-rhythmbox)
-  (keymap-set minibuffer-local-map "C-r" #'counsel-minibuffer-history)
   )
+
+(use-package counsel
+  :straight t
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x C-f" . counsel-find-file)
+	 ("C-x C-/" . counsel-fzf)
+	 ("<f1> f" . counsel-describe-function)
+	 ("<f1> v" . counsel-describe-variable)
+	 ("<f1> o" . counsel-describe-symbol)
+	 ("<f1> l" . counsel-find-library)
+	 ("<f2> i" . counsel-info-lookup-symbol)
+	 ("<f2> u" . counsel-unicode-char)
+	 :map minibuffer-local-map
+	 ("C-r" . counsel-minibuffer-history)))
+
+(use-package swiper
+  :straight t
+  :bind (("C-s" . swiper-isearch)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming and Aesthetics ;;
@@ -192,6 +193,8 @@
                "Close tab")
    tab-bar-new-button (propertize "  +  " 'face 'tab-bar-tab-inactive 'help-echo "New tab")))
 
+(straight-use-package '(transpose-frame :type git :host github :repo "emacsorphanage/transpose-frame" :commit "94c8779"))
+
 ;; With a delay in key strokes, suggests a key stroke command
 (use-package
   which-key
@@ -206,6 +209,11 @@
   :diminish company-mode
   :config (add-hook 'after-init-hook #'global-company-mode))
 
+(use-package cmake-mode
+  :straight t
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+	 ("\\.cmake\\'" . cmake-mode)))
+
 ;; Syntax checking
 (use-package
   flycheck
@@ -213,9 +221,11 @@
   :diminish flycheck-mode
   :config (add-hook 'after-init-hook #'global-flycheck-mode))
 
-(use-package robot-mode :straight t)
-(add-to-list 'auto-mode-alist '("\\.robot$" . robot-mode))
-(add-to-list 'auto-mode-alist '("\\.resource$" . robot-mode))
+(use-package robot-mode
+  :straight t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.robot$" . robot-mode))
+  (add-to-list 'auto-mode-alist '("\\.resource$" . robot-mode)))
 
 (defvar my-terminal-shell
   (if (eq system-type 'darwin)
@@ -226,6 +236,10 @@
   vterm
   :straight t
   :commands (vterm my/open-terminal)
+  :bind
+  ;; In order for delete key to work when using emacs in terminal mode
+  ;; not needed for gui - see https://github.com/akermu/emacs-libvterm/issues/741
+  (:map vterm-mode-map ([deletechar] . vterm-send-delete))
   :config
   (setq vterm-shell my-terminal-shell)
   (defun my/open-terminal (&optional _arg)
@@ -235,21 +249,48 @@
   (defalias 'term #'my/open-terminal)
   (defalias 'multi-term #'my/open-terminal))
 
+
+
+(add-to-list 'term-file-aliases '("xterm-ghostty" . "xterm-256color"))
+
 (use-package
   multi-vterm
   :straight
   (:type git :host github :repo "suonlight/multi-vterm" :files ("*.el")))
 
-;; In order for delete key to work when using emacs in terminal mode
-;; not needed for gui - see https://github.com/akermu/emacs-libvterm/issues/741
-(define-key vterm-mode-map [deletechar] #'vterm-send-delete)
+
+;; This is the only easy way I've found to persist my tab bar organization
+;; Emacs desktop mode frustratingly does not save tabs (at least on Emacs 30)
+;; Running under tmux ruins the theme - in a way I have not been able to debug
+(use-package easysession
+  :straight t
+  :demand t
+
+  :config
+  ;; Save every 10 minutes
+  (setq easysession-save-interval (* 10 60))
+  ;; Save the current session when using `easysession-switch-to'
+  (setq easysession-switch-to-save-session t)
+  ;;
+  ;; Do not exclude the current session when switching sessions
+  (setq easysession-switch-to-exclude-current nil)
+  ;;
+  ;; non-nil: Make `easysession-setup' load the session automatically.
+  ;; (nil: session is not loaded automatically; the user can load it manually.)
+  (setq easysession-setup-load-session t)
+
+  ;; The `easysession-setup' function adds hooks:
+  ;; - To enable automatic session loading during `emacs-startup-hook', or
+  ;;   `server-after-make-frame-hook' when running in daemon mode.
+  ;; - To save the session at regular intervals, and when Emacs exits.
+  ;; (easysession-setup)
+  )
 
 (straight-use-package 'markdown-mode)
 
 (if (eq system-type 'darwin)
     (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
   (setq markdown-executable-path "/usr/local/bin/pandoc"))
-
 
 (use-package
   mcp-server
@@ -266,6 +307,25 @@
   moody
   :straight t
   :config
+  (defface my-moody-buffer-name
+    '((t (:foreground "white" :background "black" :weight bold)))
+    "Face for Moody buffer-name tab.")
+  (defun my-moody-black-tab (string &optional width direction)
+    (mapcar
+     (lambda (part)
+       (if (stringp part)
+	   (propertize part 'face 'my-moody-buffer-name)
+	 part))
+     (moody-tab string width direction)))
+
+  (setq-default moody-mode-line-buffer-identification
+		'(:eval
+		  (my-moody-black-tab
+		   (car (propertized-buffer-identification
+			 (format-mode-line "%b")))
+		   20
+		   'down)))
+
   (setq-default mode-line-format
 		'(""
                   mode-line-front-space
@@ -278,17 +338,13 @@
                   (multiple-cursors-mode mc/mode-line)
                   mode-line-modes
                   mode-line-end-spaces))
-  (moody-replace-mode-line-buffer-identification) (moody-replace-vc-mode))
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 (setq-default fill-column 80)
 
-
-(load "glsl")
-;; Some additional shader extensions I've seen
-(add-to-list 'auto-mode-alist '("\\.vs$" . glsl-mode))
-(add-to-list 'auto-mode-alist '("\\.fs$" . glsl-mode))
 
 ;; New frames will not have to load the configuration from scratch
 (require 'server)
@@ -324,36 +380,6 @@
   (when (daemonp)
     (exec-path-from-shell-initialize)))
 
-(use-package easysession
-  ;; ':demand t' ensures the package is loaded immediately upon startup
-  :straight t
-  :demand t
-
-  :config
-  ;; Save every 10 minutes
-  (setq easysession-save-interval (* 10 60))
-
-  ;; Save the current session when using `easysession-switch-to'
-  (setq easysession-switch-to-save-session t)
-
-  ;; Do not exclude the current session when switching sessions
-  (setq easysession-switch-to-exclude-current nil)
-
-  ;; Display the active session name in the mode-line lighter.
-  ;; (setq easysession-save-mode-lighter-show-session-name t)
-
-  ;; Optionally, the session name can be shown in the modeline info area:
-  ;; (setq easysession-mode-line-misc-info t)
-  ;; non-nil: Make `easysession-setup' load the session automatically.
-  ;; (nil: session is not loaded automatically; the user can load it manually.)
-  (setq easysession-setup-load-session t)
-
-  ;; The `easysession-setup' function adds hooks:
-  ;; - To enable automatic session loading during `emacs-startup-hook', or
-  ;;   `server-after-make-frame-hook' when running in daemon mode.
-  ;; - To save the session at regular intervals, and when Emacs exits.
-  (easysession-setup))
-
 (use-package
   apheleia
   :straight t
@@ -365,3 +391,7 @@
 	      ".c")
           "-style=file" ; Forces looking for a local .clang-format file
           "-fallback-style=WebKit"))) ; Fallback if no config file is found
+
+(setq user-init-directory (file-name-directory user-init-file))
+(setq user-local-init-directory (file-name-concat user-init-directory "local"))
+(load-file (file-name-concat user-init-directory "local/init.el"))
