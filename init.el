@@ -224,10 +224,14 @@
   (add-to-list 'auto-mode-alist '("\\.robot$" . robot-mode))
   (add-to-list 'auto-mode-alist '("\\.resource$" . robot-mode)))
 
-(defvar my-terminal-shell
-  (if (eq system-type 'darwin)
-      "/bin/zsh"
-    "/bin/bash"))
+(use-package proced
+  :straight nil
+  :custom
+  (proced-enable-color-flag t)
+  :custom-face
+  (proced-time-colon ((t (:foreground "green"))))
+  :hook
+  (proced-mode . hl-line-mode))
 
 (use-package
   ghostel
