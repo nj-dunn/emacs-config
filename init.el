@@ -42,9 +42,6 @@
 
 (setq inhibit-startup-screen t)
 
-(set-frame-parameter nil 'alpha-background 85)
-(add-to-list 'default-frame-alist '(alpha-background . 70))
-
 ;; Backup files with ~ are annoying - let's put them in a temp directory
 (setq backup-directory-alist `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
@@ -233,31 +230,24 @@
     "/bin/bash"))
 
 (use-package
-  vterm
+  ghostel
   :straight t
-  :commands (vterm my/open-terminal)
-  :bind
-  ;; In order for delete key to work when using emacs in terminal mode
-  ;; not needed for gui - see https://github.com/akermu/emacs-libvterm/issues/741
-  (:map vterm-mode-map ([deletechar] . vterm-send-delete))
+  :bind (("C-c t" . ghostel))
   :config
-  (setq vterm-shell my-terminal-shell)
-  (defun my/open-terminal (&optional _arg)
-    (interactive "P")
-    (vterm))
-  (defalias 'ansi-term #'my/open-terminal)
-  (defalias 'term #'my/open-terminal)
-  (defalias 'multi-term #'my/open-terminal))
-
-
+  ;; Materialized styles the `term-color-*' faces but not the newer
+  ;; `ansi-color-*' faces from which Ghostel's palette normally inherits.
+  ;; Keep Ghostel's own (valid) 16 palette faces and redirect them instead.
+  (require 'term)
+  (dolist (color '(black red green yellow blue magenta cyan white))
+    (let ((term-face (intern (format "term-color-%s" color))))
+      (set-face-attribute
+       (intern (format "ghostel-color-%s" color)) nil :inherit term-face)
+      ;; Emacs has no `term-color-bright-*' faces.  Reuse the corresponding
+      ;; themed color; intensity attributes such as bold remain independent.
+      (set-face-attribute
+       (intern (format "ghostel-color-bright-%s" color)) nil :inherit term-face))))
 
 (add-to-list 'term-file-aliases '("xterm-ghostty" . "xterm-256color"))
-
-(use-package
-  multi-vterm
-  :straight
-  (:type git :host github :repo "suonlight/multi-vterm" :files ("*.el")))
-
 
 ;; This is the only easy way I've found to persist my tab bar organization
 ;; Emacs desktop mode frustratingly does not save tabs (at least on Emacs 30)
@@ -307,24 +297,24 @@
   moody
   :straight t
   :config
-  (defface my-moody-buffer-name
-    '((t (:foreground "white" :background "black" :weight bold)))
-    "Face for Moody buffer-name tab.")
-  (defun my-moody-black-tab (string &optional width direction)
-    (mapcar
-     (lambda (part)
-       (if (stringp part)
-	   (propertize part 'face 'my-moody-buffer-name)
-	 part))
-     (moody-tab string width direction)))
+  ;; (defface my-moody-buffer-name
+  ;;   '((t (:foreground "white" :background "black" :weight bold)))
+  ;;   "Face for Moody buffer-name tab.")
+  ;; (defun my-moody-black-tab (string &optional width direction)
+  ;;   (mapcar
+  ;;    (lambda (part)
+  ;;      (if (stringp part)
+  ;; 	   (propertize part 'face 'my-moody-buffer-name)
+  ;; 	 part))
+  ;;    (moody-tab string width direction)))
 
-  (setq-default moody-mode-line-buffer-identification
-		'(:eval
-		  (my-moody-black-tab
-		   (car (propertized-buffer-identification
-			 (format-mode-line "%b")))
-		   20
-		   'down)))
+  ;; (setq-default moody-mode-line-buffer-identification
+  ;; 		'(:eval
+  ;; 		  (my-moody-black-tab
+  ;; 		   (car (propertized-buffer-identification
+  ;; 			 (format-mode-line "%b")))
+  ;; 		   20
+  ;; 		   'down)))
 
   (setq-default mode-line-format
 		'(""
