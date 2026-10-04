@@ -123,7 +123,8 @@
 
 (use-package swiper
   :straight t
-  :bind (("C-s" . swiper-isearch)))
+  :bind (("C-s" . swiper-isearch)
+	 ("C-r" . swiper-isearch-backward)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming and Aesthetics ;;
@@ -182,12 +183,12 @@
   (setq
    tab-bar-close-button
    (propertize "  ×"
-               'close-tab
-               t
-               'face
-               'tab-bar-tab-inactive
-               'help-echo
-               "Close tab")
+	       'close-tab
+	       t
+	       'face
+	       'tab-bar-tab-inactive
+	       'help-echo
+	       "Close tab")
    tab-bar-new-button (propertize "  +  " 'face 'tab-bar-tab-inactive 'help-echo "New tab")))
 
 (straight-use-package '(transpose-frame :type git :host github :repo "emacsorphanage/transpose-frame" :commit "94c8779"))
@@ -348,6 +349,7 @@
 (use-package
   agent-shell
   :straight t
+  :bind (("C-c a" . agent-shell-new-shell))
   :config (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
   ;; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
   ;; Terminal emulator may have its own TAB bindings
@@ -366,13 +368,6 @@
 
 (if (executable-find "rg")
     (use-package rg :straight t))
-
-(use-package
-  exec-path-from-shell
-  :straight t
-  :config
-  (when (daemonp)
-    (exec-path-from-shell-initialize)))
 
 (use-package
   apheleia
