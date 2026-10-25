@@ -212,6 +212,11 @@
   :mode (("CMakeLists\\.txt\\'" . cmake-mode)
 	 ("\\.cmake\\'" . cmake-mode)))
 
+(use-package nix-mode
+  :straight t
+  :mode ("\\.nix\\")
+  )
+
 ;; Syntax checking
 (use-package
   flycheck
@@ -282,6 +287,11 @@
   )
 
 (straight-use-package 'markdown-mode)
+(use-package yaml-mode
+  :straight t
+  :mode ("\\.ya?ml\\'" . yaml-mode))
+(straight-use-package 'yaml-mode)
+
 
 (if (eq system-type 'darwin)
     (setq markdown-executable-path "/opt/homebrew/bin/pandoc")
@@ -381,6 +391,19 @@
           "-style=file" ; Forces looking for a local .clang-format file
           "-fallback-style=WebKit"))) ; Fallback if no config file is found
 
+(defun my/copy-buffer-filepath ()
+  "Copy the current buffer's absolute file path to the clipboard."
+  (interactive)
+  (if-let ((path (buffer-file-name)))
+      (progn
+        (kill-new path)
+        (message "Copied: %s" path))
+    (user-error "Current buffer is not visiting a file")))
+
+(global-set-key (kbd "C-c n") #'my/copy-buffer-filepath)
+
 (setq user-init-directory (file-name-directory user-init-file))
 (setq user-local-init-directory (file-name-concat user-init-directory "local"))
 (load-file (file-name-concat user-init-directory "local/init.el"))
+
+
