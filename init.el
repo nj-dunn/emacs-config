@@ -1,4 +1,4 @@
-
+;;; Init.el File for all environments
 (setq
  user-full-name "Nathan Dunn")
 
@@ -239,6 +239,22 @@
   :hook
   (proced-mode . hl-line-mode))
 
+;; Useful for eza in ghostel
+(use-package nerd-icons
+  :straight t
+  :config
+  ;; If emacs is running as a daemon, we need to
+  ;; check on every new frame if it's a GUI frame, or terminal emacs
+  (defun my/setup-nerd-fonts (&optional frame)
+    (with-selected-frame (or frame (selected-frame))
+      (when (display-graphic-p)
+        (unless (find-font (font-spec :family nerd-icons-font-family))
+          (nerd-icons-install-fonts t))
+        (nerd-icons-set-font))))
+
+  (add-hook 'after-make-frame-functions #'my/setup-nerd-fonts)
+  (my/setup-nerd-fonts))
+
 (use-package
   ghostel
   :straight t
@@ -312,25 +328,6 @@
   moody
   :straight t
   :config
-  ;; (defface my-moody-buffer-name
-  ;;   '((t (:foreground "white" :background "black" :weight bold)))
-  ;;   "Face for Moody buffer-name tab.")
-  ;; (defun my-moody-black-tab (string &optional width direction)
-  ;;   (mapcar
-  ;;    (lambda (part)
-  ;;      (if (stringp part)
-  ;; 	   (propertize part 'face 'my-moody-buffer-name)
-  ;; 	 part))
-  ;;    (moody-tab string width direction)))
-
-  ;; (setq-default moody-mode-line-buffer-identification
-  ;; 		'(:eval
-  ;; 		  (my-moody-black-tab
-  ;; 		   (car (propertized-buffer-identification
-  ;; 			 (format-mode-line "%b")))
-  ;; 		   20
-  ;; 		   'down)))
-
   (setq-default mode-line-format
 		'(""
                   mode-line-front-space
@@ -371,10 +368,9 @@
     (keymap-set
      agent-shell-viewport-view-mode-map
      "C-c TAB"
-     #'agent-shell-viewport-cycle-session-mode)))
-
-(setq agent-shell-openai-authentication
-      (agent-shell-openai-make-authentication :login t))
+     #'agent-shell-viewport-cycle-session-mode))
+  (setq agent-shell-openai-authentication
+	(agent-shell-openai-make-authentication :login t))     )
 
 (if (executable-find "rg")
     (use-package rg :straight t))
