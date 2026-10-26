@@ -214,7 +214,7 @@
 
 (use-package nix-mode
   :straight t
-  :mode ("\\.nix\\")
+  :mode "\\.nix\\'"
   )
 
 ;; Syntax checking
