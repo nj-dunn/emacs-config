@@ -217,6 +217,15 @@
   :mode "\\.nix\\'"
   )
 
+(if (string= system-type "darwin")
+    (setq insert-directory-program "eza"
+          dired-listing-switches "-laB --group-directories-first")
+  (setq dired-listing-switches "-laB --group-directories-first"))
+(use-package diredfl
+  :straight t
+  :ensure t
+  :hook (dired-mode . diredfl-mode))
+
 ;; Syntax checking
 (use-package
   flycheck
