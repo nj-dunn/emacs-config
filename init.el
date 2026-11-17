@@ -1,3 +1,4 @@
+;;; init.el --- Personal configuration -*- lexical-binding: t; -*-
 ;;; Init.el File for all environments
 (setq
  user-full-name "Nathan Dunn")
@@ -168,7 +169,8 @@
    :host github
    :repo "xenodium/emacs-materialized-theme"
    :branch "main"))
-(load-theme 'materialized)
+;; Trust this configured theme so daemon startup never needs confirmation.
+(load-theme 'materialized t)
 ;; Materialized doesn't style tabs out of the box
 (custom-set-faces
  '(tab-bar
@@ -369,6 +371,7 @@
   :config (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
   ;; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
   ;; Terminal emulator may have its own TAB bindings
+  (setq agent-shell-show-welcome-message nil)
   (with-eval-after-load 'agent-shell-viewport
     (keymap-set
      agent-shell-viewport-edit-mode-map
