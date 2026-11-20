@@ -371,6 +371,7 @@
   :config (keymap-set agent-shell-mode-map "C-c TAB" #'agent-shell-cycle-session-mode)
   ;; When running in terminal emacs, regular C-TAB will not reliably make it to emacs
   ;; Terminal emulator may have its own TAB bindings
+  (setq agent-shell-header-style 'text)
   (setq agent-shell-show-welcome-message nil)
   (with-eval-after-load 'agent-shell-viewport
     (keymap-set
