@@ -221,8 +221,8 @@
 
 (if (string= system-type "darwin")
     (setq insert-directory-program "eza"
-          dired-listing-switches "-laB --group-directories-first")
-  (setq dired-listing-switches "-laB --group-directories-first"))
+          dired-listing-switches "-lab --group-directories-first")
+  (setq dired-listing-switches "-lahB --group-directories-first"))
 (use-package diredfl
   :straight t
   :ensure t
@@ -363,6 +363,11 @@
 (require 'server)
 (if (not (server-running-p))
     (server-start))
+
+(use-package
+  sops
+  :straight t
+  :config (global-sops-mode 1))
 
 (use-package
   agent-shell
